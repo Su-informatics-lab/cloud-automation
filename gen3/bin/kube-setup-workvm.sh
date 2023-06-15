@@ -129,9 +129,6 @@ if sudo -n true > /dev/null 2>&1 && [[ $(uname -s) == "Linux" ]]; then
   if ! which kubectl > /dev/null 2>&1; then
     gen3_log_info "Installing kubectl"
     sudo -E apt-get install -qq -y kubectl > /dev/null
-  else 
-    gen3_log_info "Upgrading kubectl"
-    sudo -E apt-get upgrade -qq -y kubectl > /dev/null
   fi
 
   mkdir -p ~/.config
