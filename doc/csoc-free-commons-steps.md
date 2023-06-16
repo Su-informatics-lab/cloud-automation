@@ -10,9 +10,10 @@ The following guide is intended to guide you through the process of bringing up 
 - [1. Requirements](#requirements)
 - [2. Setting up the adminVM](#first-part-setting-up-the-adminvm)
 - [3. Start gen3](#second-part-start-gen3)
-- [4. Deploy kubernetes](#third-part-deploy-the-kubernetes-cluster)
-- [5. Bring up services in kubernetes](#fourth-part-bring-up-services-in-kubernetes)
-- [6. Cleanup process](#cleanup-process)
+- [4. Deploy Elasticsearch](#third-part-deploy-elasticsearch)
+- [5. Deploy kubernetes](#fourth-part-deploy-the-kubernetes-cluster)
+- [6. Bring up services in kubernetes](#fifth-part-bring-up-services-in-kubernetes)
+- [7. Cleanup process](#cleanup-process)
 
 
 
@@ -50,7 +51,10 @@ Additionally, we recommend requesting a SSL certificate for the domain you are g
 
 1. Clone the repo
 ```bash
-git clone https://github.com/uc-cdis/cloud-automation.git
+git clone https://github.com/jing-su/cloud-automation.git
+cd cloud-automation
+git checkout ardac
+cd
 ```
 
 2. If no proxy is needed then 
@@ -77,7 +81,6 @@ source ${HOME}/.bashrc
   output = json
   region = us-east-1
   credential_source = Ec2InstanceMetadata
-
   [profile cdistest]
   output = json
   region = us-east-1
@@ -98,10 +101,10 @@ gen3 workon <aws profile> <commons-name>
 
 Ex:
 ```
-gen3 workon cdistest commons-test
+gen3 workon ardac ardac-dev
 ```
 
-  Note: The third argument of the above command (cdistest) refers to the profile in the config file setup in step five of the first part.
+  Note: The third argument of the above command (cdistest) refers to the profile in the config file from step five of the admin VM setup.
         The forth argument (commons-test) would be the name of the commons you want to use; only lowercase letters and hyphens are permitted. Making the commmons-name unique is recommended.
 
 2. Go to the terraform workspace folder
@@ -155,24 +158,58 @@ gen3 tfplan
 gen3 tfapply
 ```
 
+NOTE: There is sometimes an error on the first "apply" about bucket policy conflicts. Simply run `gen3 tfplan` and `gen3 tfapply` again and the process should complete successfully.
+
 6. Copy the newly commons-test_output folder created to the user's home folder. Keep in mind that you'll see the folder if you haven't `cd` onto a different folder after running `gen3 cd`
 ```bash
 cp -r commons-test_output/ $HOME
 ```
 
+## Third part: deploy Elasticsearch
 
+NOTE: In the current version, only one instance of Elasticsearch is supported per AWS account. This is due to naming, which will not be unique to a deployment. In other words, there can only be one active Gen3 deployment per account.
 
+1. Initialize the base module
+```bash
+gen3 workon <aws profile> <commons-name>_es 
+```
 
+Ex:
+```
+gen3 workon ardac ardac-dev_es
+```
 
-## Third part, deploy the kubernetes cluster
+  Note: The third argument of the above command (cdistest) refers to the profile in the config file from step five of the admin VM setup.
+        The fourth argument would be the name of the commons you want to use; only lowercase letters and hyphens are permitted. You must add `_es` to the name in order to invoke the ES module.
+
+2. Go to the terraform workspace folder
+```bash
+gen3 cd
+```
+
+3. Edit the `config.tfvars` file with your preferred text editor.
+
+4. Create a terraform plan
+```bash
+gen3 tfplan
+```
+  You may want to review what will be created by terraform by going through the outputed plan.
+
+5. Apply the previously created plan
+```bash
+gen3 tfapply
+```
+Be patient! This step will take quite a while (15-20 mins).
+
+## Fourth part, deploy the kubernetes cluster
 
 1. Initialize the EKS module
 ```bash
 gen3 workon cdistest commons-test_eks
 ```
 
-  Note: The third argument of the above command (cdistest) refers to the profile in the config file setup in step five of the first part.
-        The forth argument would be the name of the commons you want to use; only lowercase letters and hyphens are permitted. You must add `_eks` to the name in order to invoke the EKS module.
+  Note: The third argument of the above command (cdistest) refers to the profile in the config file from step five of the admin VM setup.
+        The fourth argument would be the name of the commons you want to use; only lowercase letters and hyphens are permitted. You must add `_eks` to the name in order to invoke the EKS module.
 
 2. Go to the terraform workspace folder
 ```bash
@@ -202,7 +239,7 @@ gen3 cd
 
 *Optional*
 
-`eks_version` default set to 1.14, but you can change it to 1.13 or 1.15.
+`eks_version` You should change this to 1.21 or higher. This should match the kubectl version installed on the admin VM. Be aware that if you set it too high you could encounter fatal errors on the EKS deployment.
 `sns_topic_arn` The kubernetes cluster that runs gen3 commons run a fluentd daemonset that sends logs onto CloudWatchLogGroups. If using fluentd version `v1.10.2-debian-cloudwatch-1.0` (set in the manifest), the configuration used would create new CloudWatchLogs Streams with the date as prefix, for this to work and rotate daily , a cron job must be running on the cluster that does this for us. 
                 Said job would publish an SNS topic of your choice. Should you want this enable, set this variable with a valid SNS so the kubernetes workers can access the service.
 
@@ -218,7 +255,8 @@ gen3 tfplan
 ```bash
 gen3 tfapply
 ```
-
+  Again, be patient. This deployment will take about 10-15 minutes.
+  
 6. The EKS module creates a kubernetes configuration file (kubeconfig), copy it to the user's home folder.
 ```bash
 cp commons-test_output_EKS/kubeconfig $HOME
@@ -228,7 +266,7 @@ cp commons-test_output_EKS/kubeconfig $HOME
 
 
 
-## Fourth part, bring up services in kubernetes
+## Fifth part, bring up services in kubernetes
 
 
 1. Copy the esential files onto `Gen3Secrets` folder
@@ -268,20 +306,20 @@ mkdir -p ${HOME}/cdis-manifest/commons-test.planx-pla.net
     "That's all I have to say"
   ],
   "versions": {
-    "arborist": "quay.io/cdis/arborist:master",
-    "aws-es-proxy": "quay.io/cdis/aws-es-proxy:0.8",
-    "fence": "quay.io/cdis/fence:master",
+    "arborist": "quay.io/cdis/arborist:2022-06",
+    "aws-es-proxy": "quay.io/cdis/aws-es-proxy:v1.3.1",
+    "fence": "quay.io/cdis/fence:2022-06",
     "fluentd": "fluent/fluentd-kubernetes-daemonset:v1.2-debian-cloudwatch",
-    "indexd": "quay.io/cdis/indexd:master",
-    "jupyterhub": "quay.io/occ_data/jupyterhub:master",
-    "peregrine": "quay.io/cdis/peregrine:master",
-    "pidgin": "quay.io/cdis/pidgin:master",
-    "portal": "quay.io/cdis/data-portal:master",
-    "revproxy": "quay.io/cdis/nginx:1.15.5-ctds",
-    "sheepdog": "quay.io/cdis/sheepdog:master",
-    "spark": "quay.io/cdis/gen3-spark:master",
-    "manifestservice": "quay.io/cdis/manifestservice:master",
-    "wts": "quay.io/cdis/workspace-token-service:master"
+    "indexd": "quay.io/cdis/indexd:2022-06",
+    "jupyterhub": "quay.io/occ_data/jupyterhub:2022-06",
+    "peregrine": "quay.io/cdis/peregrine:2022-06",
+    "pidgin": "quay.io/cdis/pidgin:2022-06",
+    "portal": "quay.io/cdis/data-portal:2022-06",
+    "revproxy": "quay.io/cdis/nginx:2022-06",
+    "sheepdog": "quay.io/cdis/sheepdog:2022-06",
+    "spark": "quay.io/cdis/gen3-spark:2022-06",
+    "manifestservice": "quay.io/cdis/manifestservice:2022-06",
+    "wts": "quay.io/cdis/workspace-token-service:2022-06"
   },
   "arborist": {
     "deployment_version": "2"
@@ -290,13 +328,13 @@ mkdir -p ${HOME}/cdis-manifest/commons-test.planx-pla.net
     "enabled": "no"
   },
   "global": {
-    "environment": "devplanetv1",
-    "hostname": "commons-test.planx-pla.net",
+    "environment": "ardac6",
+    "hostname": "dev.ardac.org",
     "revproxy_arn": "arn:aws:acm:us-east-1:707767160287:certificate/c676c81c-9546-4e9a-9a72-725dd3912bc8",
     "dictionary_url": "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json",
     "portal_app": "dev",
-    "kube_bucket": "kube-commons-test-gen3",
-    "logs_bucket": "logs-commons-test-gen3",
+    "kube_bucket": "kube-ardac6-gen3",
+    "logs_bucket": "logs-ardac-gen3",
     "sync_from_dbgap": "False",
     "useryaml_s3path": "s3://cdis-gen3-users/dev/user.yaml",
     "netpolicy": "on"
@@ -314,7 +352,6 @@ The file should look something like the following at the bottom of it:
 ```bash
 export vpc_name='commons-test'
 export s3_bucket='kube-commons-test-gen3'
-
 export KUBECONFIG=~/Gen3Secrets/kubeconfig
 export GEN3_HOME=~/cloud-automation
 if [ -f "${GEN3_HOME}/gen3/gen3setup.sh" ]; then
@@ -329,14 +366,15 @@ if [[ -z "$GEN3_NOPROXY" ]]; then
 fi
 ```
 
-If it doesn't, adjust accordingly. If it does, source it:
+NOTE: It is very important to check the first two lines, which reference the specific deployment. Be sure to check that this matches your current deployment. Edit as necessary, then source it:
+
 ```bash
-source ~/.bashrrc
+source ~/.bashrc
 ```
 
 6. Apply the global manifest
 ```bash
-$ kubectl apply -f ~/Gen3Secrets/00configmap.yaml
+kubectl apply -f ~/Gen3Secrets/00configmap.yaml
 ```
 
 7. Verify that kubernetes is up. After sourcing our local bashrc file we should be able to talk to kubernetes:
@@ -356,10 +394,17 @@ gen3 roll all
 kubectl get service revproxy-service-elb -o json | jq -r .status.loadBalancer.ingress[].hostname
 ```
 
-10. Go to your registrar and point the desired domain to the outcome of above command.
+10. Go to your registrar and point the desired domain to the outcome of above command. In AWS, this is done using Route 53.
 
+11. Enable Google logins
 
+Use vi to edit $HOME/Gen3Secrets/apis_configs/fence-config.yaml
 
+* Replace the empty strings for `client_id` and `client_secret`, replacing them with the correct Google Client ID and Secret.
+* Remove empty list `[]` from LOGIN_OPTIONS. Uncomment the first four lines, which contain the `'Login from Google'` configuration.
+* Set DEFAULT_LOGIN_IDP to `'google'` (defaults to null)
+
+After saving your edits, run `gen3 kube-setup-fence` to redeploy Fence with the changes.
 
 # Cleanup process
 
@@ -396,10 +441,22 @@ Now, let's delete kubernetes cluster:
 
 ```bash
 gen3 workon cdistest commons-test_eks
+gen3 cd
 gen3 tfplan --destroy
 gen3 tfapply
 ```
 
+Once that destroy is done, let's delete the Elasticsearch deployment.
+
+## Destroy the Elasticsearch deployment
+
+
+```bash
+gen3 workon cdistest commons-test_es
+gen3 cd
+gen3 tfplan --destroy
+gen3 tfapply
+```
 
 Once that destroy is done, let's delete the base components.
 
@@ -408,10 +465,15 @@ Once that destroy is done, let's delete the base components.
 
 ```bash
 gen3 workon cdistest commons-test
+gen3 cd
 gen3 tfplan --destroy
 gen3 tfapply
 ```
 
 **NOTES:**
-Sometimes buckets created through `gen3` get populated with logs and other data. You may need to empty them before running the above commands. Otherwise, when applying the plan it might fail to delete the bucket.
-
+* Sometimes buckets created through `gen3` get populated with logs and other data. You may need to empty them before running the above commands. Otherwise, when applying the plan it might fail to delete the bucket.
+* RDS instances will sometimes complain about snapshots. In this case, probably easiest to delete them manually using the AWS web console.
+* If any destroys get stuck, try using terraform directly, e.g.:
+```
+terraform destroy
+```

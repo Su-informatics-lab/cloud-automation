@@ -13,6 +13,8 @@ module "squid_proxy" {
   deploy_single_proxy  = "${var.deploy_single_proxy}"
   instance_type        = "${var.single_squid_instance_type}"
   organization_name    = "${var.organization_name}"
+  ami_account_id       = "${var.ami_account_id}"
+  ami_name             = "${var.squid_image_search_criteria}"
 }
 
 
