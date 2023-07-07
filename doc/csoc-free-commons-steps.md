@@ -51,10 +51,7 @@ Additionally, we recommend requesting a SSL certificate for the domain you are g
 
 1. Clone the repo
 ```bash
-git clone https://github.com/jing-su/cloud-automation.git
-cd cloud-automation
-git checkout ardac
-cd
+git clone https://github.com/alan-walsh/cloud-automation.git
 ```
 
 2. If no proxy is needed then 
@@ -101,7 +98,7 @@ gen3 workon <aws profile> <commons-name>
 
 Ex:
 ```
-gen3 workon ardac ardac-dev
+gen3 workon cdistest commons-test
 ```
 
   Note: The third argument of the above command (cdistest) refers to the profile in the config file from step five of the admin VM setup.
@@ -144,6 +141,10 @@ gen3 cd
 
 `users_bucket_name` This also has something to do with the user.yaml file. In case you need your commons to access a user.yaml file in a different bucket than `cdis-gen3-users`, then add this variable with the corresponding value. Terraform with ultimately create a policy allowing the Kubernetes worker nodes to access the bucket in question (Ex. `s3://<user_bucket_name>/<config_folder>/user.yaml`).
 
+`fence_engine_version`, `sheepdog_engine_version`, `indexd_engine_version` This must be set to a valid Postgres version supported by RDS. Default will often fail as it changes more quickly than the Gen3 code. Check the [AWS documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html#PostgreSQL.Concepts.General.DBVersions) for a list of supported versions.
+
+`fence_db_instance`, `sheepdog_db_instance`, `indexd_db_instance` EC2 instance type(s) for the databases. `db.t4g.micro` is suitable for non-production deployments. See [AWS documentation](https://aws.amazon.com/ec2/instance-types/) for a list of available instance types.
+
 **NOTE:** If you are hooking up your commons with a centralized control management account, you may need to add additional variables to this file with more information about said account.
 
 
@@ -176,7 +177,7 @@ gen3 workon <aws profile> <commons-name>_es
 
 Ex:
 ```
-gen3 workon ardac ardac-dev_es
+gen3 workon cdistest commons-test_es
 ```
 
   Note: The third argument of the above command (cdistest) refers to the profile in the config file from step five of the admin VM setup.
