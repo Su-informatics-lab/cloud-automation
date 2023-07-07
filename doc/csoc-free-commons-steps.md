@@ -190,6 +190,14 @@ gen3 cd
 
 3. Edit the `config.tfvars` file with your preferred text editor.
 
+Variables to pay attention to:
+
+`instance_type` This is the instance type for the Elasticsearch instance. `t3.small.elasticsearch` is a good choice for non-production deployments. See [AWS documentation](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html) for a list of available instance types.
+
+NOTE: Terraform requires the "*elasticsearch" name, which is not the same as the actual AWS instance types.
+
+`instance_count` Number of instances to deploy. `1` is suitable for non-production deployments.
+
 4. Create a terraform plan
 ```bash
 gen3 tfplan
@@ -221,11 +229,15 @@ gen3 cd
 
   Variables to pay attention to:
 
+`cidrs_to_route_to_gw` Comment out this line to avoid an error message when you run `gen3 tfplan`. This line is only needed if you are hooking up your commons with a centralized control management account.
+
 `vpc_name` name of the commons it *MUST* be the same one used in part two.
 
 `users_policy` this is the name of the policy that allows access to the user.yaml file mentioned in part two. This variable value should always be the same as the above one, but it might differ in very specific cases.
 
 `instance_type` default set to t3.xlarge. Change if necessary.
+
+NOTE: Gen3 containers support the ARM64 architecture. If you want to use ARM64 instances, you must change the instance type to one that supports ARM64. See [AWS documentation](https://aws.amazon.com/ec2/instance-types/) for a list of available instance types. `t4g.2xlarge` is a good choice for non-production deployments. If you build your own custom container images then make sure that they have support for ARM64. Otherwise, `t3a.*` is a good choice for instance types.
 
 `ec2_keyname` an existing Key Pair in EC2 for the workers for deployment. More keys can be added automatically if you specify them in $HOME/cloud-automation/files/authorized_keys/ops_team.
 
@@ -237,10 +249,10 @@ gen3 cd
 
 `peering_cidr` basically the CIDR of the VPC where you are running gen3. Pretty much the same as `csoc_vpc_id` for part two.
 
+`eks_version` You should change this to 1.23 or higher. This should (ideally) match the kubectl version installed on the admin VM. Be aware that if you set it too high you could encounter fatal errors on the EKS deployment. Be aware that this is very tricky to get right because EKS versions change rapidly, and Gen3 often struggles to keep up. See [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html) for a list of available versions.
 
 *Optional*
 
-`eks_version` You should change this to 1.21 or higher. This should match the kubectl version installed on the admin VM. Be aware that if you set it too high you could encounter fatal errors on the EKS deployment.
 `sns_topic_arn` The kubernetes cluster that runs gen3 commons run a fluentd daemonset that sends logs onto CloudWatchLogGroups. If using fluentd version `v1.10.2-debian-cloudwatch-1.0` (set in the manifest), the configuration used would create new CloudWatchLogs Streams with the date as prefix, for this to work and rotate daily , a cron job must be running on the cluster that does this for us. 
                 Said job would publish an SNS topic of your choice. Should you want this enable, set this variable with a valid SNS so the kubernetes workers can access the service.
 
