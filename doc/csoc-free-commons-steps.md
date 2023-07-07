@@ -125,6 +125,8 @@ gen3 cd
 
 `hostname` domain which the commons will respond to
 
+`single_squid_instance_type` instance type for the squid proxy. `t3a.small` is a good choice for non-production commons.
+
 `config_folder` folder for permissions. By default, commons would try to load a user.yaml file from s3://cdis-gen3-users/CONFIG_FOLDER/user.yaml. This bucket is not publicly accessible however you can set a different one later. Keep in mind that the folder with the name you are setting this var will need to exist within the bucket and a user.yaml file within the folder in question. You can still set permissions based on a local file. 
 
 
@@ -310,7 +312,7 @@ mkdir -p ${HOME}/cdis-manifest/commons-test.planx-pla.net
 
 4. Create a manifest file
 
-  With the text editor of your preference, create a new file and open it, Ex: `${HOME}/cdis-manifest/commons-test.planx-pla.net/manifest.json`. The content of the file shold be similar to:
+  With the text editor of your preference, create a new file and open it, Ex: `${HOME}/cdis-manifest/commons-test.planx-pla.net/manifest.json`. The content of the file should be similar to:
 
 ```json
 {
