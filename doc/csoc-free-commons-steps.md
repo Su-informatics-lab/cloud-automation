@@ -127,6 +127,8 @@ gen3 cd
 
 `single_squid_instance_type` instance type for the squid proxy. `t3a.small` is a good choice for non-production commons.
 
+`indexd_prefix` This is the prefix that will be used by Indexd for all uploads. Use `dg.ardac/` unless there is a good reason not to. Note the trailing slash.
+
 `config_folder` folder for permissions. By default, commons would try to load a user.yaml file from s3://cdis-gen3-users/CONFIG_FOLDER/user.yaml. This bucket is not publicly accessible however you can set a different one later. Keep in mind that the folder with the name you are setting this var will need to exist within the bucket and a user.yaml file within the folder in question. You can still set permissions based on a local file. 
 
 
