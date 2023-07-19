@@ -125,7 +125,15 @@ gen3 cd
 
 `hostname` domain which the commons will respond to
 
-`single_squid_instance_type` instance type for the squid proxy. `t3a.small` is a good choice for non-production commons.
+`single_squid_instance_type` instance type for the single squid proxy. `t3a.small` is a good choice for non-production commons.
+
+If you are deploying HA squid, you will need to set the following variables:
+
+`deploy_ha_squid` and `deploy_single_proxy` are mutually exclusive. When one is set to true, the other should be set to false.
+
+`ha-squid_instance_type` as with the single proxy, `t3a.small` is a good choice for non-production commons.
+
+`ha-squid_cluster_desired_capasity` and `ha-squid_cluster_max_size` are the desired and maximum number of instances in the cluster. For non-production commons, set desired to `1` and max to `2` as a good starting point. 
 
 `indexd_prefix` This is the prefix that will be used by Indexd for all uploads. Use `dg.ardac/` unless there is a good reason not to. Note the trailing slash.
 
@@ -246,6 +254,8 @@ NOTE: Gen3 containers support the ARM64 architecture. If you want to use ARM64 i
 `ec2_keyname` an existing Key Pair in EC2 for the workers for deployment. More keys can be added automatically if you specify them in $HOME/cloud-automation/files/authorized_keys/ops_team.
 
 **NOTE:** If the following variables are not in the file, just add them along with their values.
+
+`ha_squid` Set to true if you have a high availability squid proxy (see above). Default is false.
 
 `peering_vpc_id` VPC id from where you are running gen3 commands, must be in the same region as where you are running gen3.
 
