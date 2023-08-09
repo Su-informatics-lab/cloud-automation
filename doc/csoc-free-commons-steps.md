@@ -324,54 +324,15 @@ mkdir -p ${HOME}/cdis-manifest/commons-test.planx-pla.net
 
 4. Create a manifest file
 
-  With the text editor of your preference, create a new file and open it, Ex: `${HOME}/cdis-manifest/commons-test.planx-pla.net/manifest.json`. The content of the file should be similar to:
+  With the text editor of your preference, create a new file and open it, Ex: `${HOME}/cdis-manifest/commons-test.planx-pla.net/manifest.json`.
+
+  NOTES: 
+  - Use the release manifest as a starting point: https://github.com/uc-cdis/cdis-manifest/tree/master/releases, but be sure to edit the scaling values as the defaults tend to be quite high (e.g. 15 replicas for presigned URLs, 5 for fence, etc.)
+  - You might need to add a configuration entry to create the ELB service:
 
 ```json
-{
-  "notes": [
-    "This is the dev environment manifest",
-    "That's all I have to say"
-  ],
-  "versions": {
-    "arborist": "quay.io/cdis/arborist:2022-06",
-    "aws-es-proxy": "quay.io/cdis/aws-es-proxy:v1.3.1",
-    "fence": "quay.io/cdis/fence:2022-06",
-    "fluentd": "fluent/fluentd-kubernetes-daemonset:v1.2-debian-cloudwatch",
-    "indexd": "quay.io/cdis/indexd:2022-06",
-    "jupyterhub": "quay.io/occ_data/jupyterhub:2022-06",
-    "peregrine": "quay.io/cdis/peregrine:2022-06",
-    "pidgin": "quay.io/cdis/pidgin:2022-06",
-    "portal": "quay.io/cdis/data-portal:2022-06",
-    "revproxy": "quay.io/cdis/nginx:2022-06",
-    "sheepdog": "quay.io/cdis/sheepdog:2022-06",
-    "spark": "quay.io/cdis/gen3-spark:2022-06",
-    "manifestservice": "quay.io/cdis/manifestservice:2022-06",
-    "wts": "quay.io/cdis/workspace-token-service:2022-06"
-  },
-  "arborist": {
-    "deployment_version": "2"
-  },
-  "jupyterhub": {
-    "enabled": "no"
-  },
-  "global": {
-    "environment": "ardac6",
-    "hostname": "dev.ardac.org",
-    "revproxy_arn": "arn:aws:acm:us-east-1:707767160287:certificate/c676c81c-9546-4e9a-9a72-725dd3912bc8",
-    "dictionary_url": "https://s3.amazonaws.com/dictionary-artifacts/datadictionary/develop/schema.json",
-    "portal_app": "dev",
-    "kube_bucket": "kube-ardac6-gen3",
-    "logs_bucket": "logs-ardac-gen3",
-    "sync_from_dbgap": "False",
-    "useryaml_s3path": "s3://cdis-gen3-users/dev/user.yaml",
-    "netpolicy": "on"
-  },
-  "canary": {
-    "default": 0
-  }
-}
+"deploy_elb": "true",
 ```
-
 
 5. Check your `.bashrc` file to make sure it'll make gen3 work properly and source it.
 
