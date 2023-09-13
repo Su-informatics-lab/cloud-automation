@@ -49,7 +49,7 @@ Additionally, we recommend requesting a SSL certificate for the domain you are g
 
 ## First part, setting up the adminVM
 
-1. Clone the repo
+1. Clone the repo (if you have not done so already)
 ```bash
 git clone https://github.com/Su-informatics-lab/cloud-automation.git --branch ardac
 ```
@@ -95,13 +95,13 @@ source ${HOME}/.bashrc
 gen3 workon <aws profile> <commons-name> 
 ```
 
-Ex:
+E.g.:
 ```
-gen3 workon cdistest commons-test
+gen3 workon ardac ardac-test
 ```
 
-  Note: The third argument of the above command (cdistest) refers to the profile in the config file from step five of the admin VM setup.
-        The forth argument (commons-test) would be the name of the commons you want to use; only lowercase letters and hyphens are permitted. Making the commmons-name unique is recommended.
+  Note: The third argument of the above command (ardac) refers to the profile in the AWS config file that was created during the admin VM setup.
+        The fourth argument (ardac-test) would be the name of the commons you want to use; only lowercase letters and hyphens are permitted. Making the commmons-name unique is recommended.
 
 2. Go to the terraform workspace folder
 ```bash
