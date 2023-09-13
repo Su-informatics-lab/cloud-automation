@@ -51,7 +51,7 @@ Additionally, we recommend requesting a SSL certificate for the domain you are g
 
 1. Clone the repo
 ```bash
-git clone https://github.com/alan-walsh/cloud-automation.git
+git clone https://github.com/Su-informatics-lab/cloud-automation.git --branch ardac
 ```
 
 2. If no proxy is needed then 
@@ -70,8 +70,7 @@ bash cloud-automation/gen3/bin/kube-setup-workvm.sh
 source ${HOME}/.bashrc
 ```
 
-5. Edit the local aws config file by adding a profile additionally to the default, even if it's the same info as the default. 
-   Usually said file is located in the user's home (${HOME})folder. And it should look something like:
+5. Confirm that the AWS CLI config file was created during the admin VM deployment. Usually said file is located in the user's home (${HOME})folder. And it should look something like:
 ```bash
   ubuntu@ip-172-31-40-144:~$ cat ${HOME}/.aws/config 
   [default]
