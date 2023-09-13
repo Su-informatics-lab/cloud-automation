@@ -124,6 +124,9 @@ gen3 cd
 
 `hostname` domain which the commons will respond to
 
+>[!WARNING]
+>HA squid is strongly recommended in all deployments. You can specify a single node in the cluster (example below) which is the same net effect as a single instance. The Gen3 team has mostly dropped support for the single instance squid proxy. If you do decide to use a single instance note that you will probably need to provide your own AMI.
+
 `single_squid_instance_type` instance type for the single squid proxy. `t3a.small` is a good choice for non-production commons.
 
 If you are deploying HA squid, you will need to set the following variables:
