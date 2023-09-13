@@ -114,11 +114,11 @@ gen3 cd
 
 `vpc_name` Make sure the vpc_name is unique as some bucket names are derived from the vpc_name.
 
-`vpc_cidr_block` CIDR where the commons resources would reside. EX: 172.16.192.0/20. As for now, only /20 subnets are supported. Your VPC must have only RFC1918 or CG NAT CIDRs.
+`vpc_cidr_block` CIDR where the commons resources would reside. E.g.: 10.138.0.0/20. As for now, only /20 subnets are supported. Your VPC must have only RFC1918 or CG NAT CIDRs.
 
-`dictionary_url` url where the dictionary schema is; it must be in json format.
+`dictionary_url` url where the dictionary schema is; it must be in json format. E.g.: `https://dictionary.ardac.org/1.0.0/schema.json`
 
-`portal_app` 
+`portal_app` This should probably be set to `gitops`
 
 `aws_cert_name` AWS ARN for the certificate to use on the Load Balancer that will be in front. Access to commons is strictly through HTTPS; therefore you need one. You may want request it previously this step.
 
@@ -141,8 +141,10 @@ If you are deploying HA squid, you will need to set the following variables:
 
 `google_client_secret` and `google_client_id`  Google set of API key so you can set google authentication. You can generate a new one through Google Cloud Console.
 
+`kube_ssh_key` Replace this with the contents of the public key that was created during the admin VM setup. Should be located in the user's home folder under the name `.ssh/id_rsa.pub`.
 
-**NOTE:** If the following variables are not in the file, just add them along with their values.
+>[!NOTE] 
+>If the following variables are not in the file, just add them along with their values.
 
 `csoc_managed` if you are going to set up your commons hooked up to a central control management account. By default it is set to true. If you leave the default value, you must run the logging module first, otherwise terraform will fail. But since this instruction is specifically for non-attached deployments, you should set the value to false.
 
@@ -156,7 +158,8 @@ If you are deploying HA squid, you will need to set the following variables:
 
 `fence_db_instance`, `sheepdog_db_instance`, `indexd_db_instance` EC2 instance type(s) for the databases. `db.t4g.micro` is suitable for non-production deployments. See [AWS documentation](https://aws.amazon.com/ec2/instance-types/) for a list of available instance types.
 
-**NOTE:** If you are hooking up your commons with a centralized control management account, you may need to add additional variables to this file with more information about said account.
+>[!NOTE] 
+>If you are hooking up your commons with a centralized control management account, you may need to add additional variables to this file with more information about said account.
 
 
 4. Create a terraform plan
