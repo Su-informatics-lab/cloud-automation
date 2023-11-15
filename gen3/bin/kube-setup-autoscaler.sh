@@ -33,6 +33,21 @@ function get_autoscaler_version(){
   local casv
 
   case ${k8s_version} in
+    "1.27+")
+      casv="v1.27.3"
+      ;;
+    "1.26+")
+      casv="v1.26.4"
+      ;;
+    "1.25+")
+      casv="v1.25.3"
+      ;;
+    "1.24+")
+      casv="v1.24.3"
+      ;;
+    "1.23+")
+      casv="v1.23.0"
+      ;;
     "1.22+")
       casv="v1.22.2"
       ;;
