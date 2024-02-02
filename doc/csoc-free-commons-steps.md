@@ -100,8 +100,8 @@ E.g.:
 gen3 workon ardac ardac-test
 ```
 
-  Note: The third argument of the above command (ardac) refers to the profile in the AWS config file that was created during the admin VM setup.
-        The fourth argument (ardac-test) would be the name of the commons you want to use; only lowercase letters and hyphens are permitted. Making the commmons-name unique is recommended.
+>[!Note]
+>The third argument of the above command (ardac) refers to the profile in the AWS config file that was created during the admin VM setup. The fourth argument (ardac-test) would be the name of the commons you want to use; only lowercase letters and hyphens are permitted. Making the commmons-name unique is recommended.
 
 2. Go to the terraform workspace folder
 ```bash
@@ -185,7 +185,8 @@ cp -r commons-test_output/ $HOME
 
 ## Third part: deploy Elasticsearch
 
-NOTE: In the current version, only one instance of Elasticsearch is supported per AWS account. This is due to naming, which will not be unique to a deployment. In other words, there can only be one active Gen3 deployment per account.
+>[!NOTE] 
+>In the current version, only one instance of Elasticsearch is supported per AWS account. This is due to naming, which will not be unique to a deployment. In other words, there can only be one active Gen3 deployment per account.
 
 1. Initialize the base module
 ```bash
@@ -197,8 +198,8 @@ Ex:
 gen3 workon cdistest commons-test_es
 ```
 
-  Note: The third argument of the above command (cdistest) refers to the profile in the config file from step five of the admin VM setup.
-        The fourth argument would be the name of the commons you want to use; only lowercase letters and hyphens are permitted. You must add `_es` to the name in order to invoke the ES module.
+>[!Note]
+>The third argument of the above command (cdistest) refers to the profile in the config file from step five of the admin VM setup. The fourth argument would be the name of the commons you want to use; only lowercase letters and hyphens are permitted. You must add `_es` to the name in order to invoke the ES module.
 
 2. Go to the terraform workspace folder
 ```bash
@@ -211,7 +212,8 @@ Variables to pay attention to:
 
 `instance_type` This is the instance type for the Elasticsearch instance. `t3.small.elasticsearch` is a good choice for non-production deployments. See [AWS documentation](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-instance-types.html) for a list of available instance types.
 
-NOTE: Terraform requires the "*elasticsearch" name, which is not the same as the actual AWS instance types.
+>[!NOTE]
+>Terraform requires the "*elasticsearch" name, which is not the same as the actual AWS instance types.
 
 `instance_count` Number of instances to deploy. `1` is suitable for non-production deployments.
 
@@ -257,11 +259,13 @@ gen3 cd
 
 `instance_type` default set to t3.xlarge. Change if necessary.
 
-NOTE: Gen3 containers support the ARM64 architecture. If you want to use ARM64 instances, you must change the instance type to one that supports ARM64. See [AWS documentation](https://aws.amazon.com/ec2/instance-types/) for a list of available instance types. `t4g.2xlarge` is a good choice for non-production deployments. If you build your own custom container images then make sure that they have support for ARM64. Otherwise, `t3a.*` is a good choice for instance types.
+>[!NOTE]
+>Gen3 containers support the ARM64 architecture. If you want to use ARM64 instances, you must change the instance type to one that supports ARM64. See [AWS documentation](https://aws.amazon.com/ec2/instance-types/) for a list of available instance types. `t4g.2xlarge` is a good choice for non-production deployments. If you build your own custom container images then make sure that they have support for ARM64. Otherwise, `t3a.*` is a good choice for instance types.
 
 `ec2_keyname` an existing Key Pair in EC2 for the workers for deployment. More keys can be added automatically if you specify them in $HOME/cloud-automation/files/authorized_keys/ops_team.
 
-**NOTE:** If the following variables are not in the file, just add them along with their values.
+>[!NOTE]
+>If the following variables are not in the file, just add them along with their values.
 
 `ha_squid` Set to true if you have a high availability squid proxy (see above). Default is false.
 
@@ -327,16 +331,16 @@ mv ${HOME}/kubeconfig ${HOME}/Gen3Secrets/
 mkdir -p ${HOME}/cdis-manifest/commons-test.planx-pla.net
 ```
 
-  Note: The cdis-manifest folder is required, if you want to use your own manifest folder name you must make changes to the code, the file containing the line is `cloud-automation/gen3/lib/g3k_manifest.sh`.
-        Moreover, a subfolder named the same as your hostname is required.
+>[!Note]
+>The cdis-manifest folder is required, if you want to use your own manifest folder name you must make changes to the code, the file containing the line is `cloud-automation/gen3/lib/g3k_manifest.sh`. Moreover, a subfolder named the same as your hostname is required.
 
 4. Create a manifest file
 
   With the text editor of your preference, create a new file and open it, Ex: `${HOME}/cdis-manifest/commons-test.planx-pla.net/manifest.json`.
 
-  NOTES: 
-  - Use the release manifest as a starting point: https://github.com/uc-cdis/cdis-manifest/tree/master/releases, but be sure to edit the scaling values as the defaults tend to be quite high (e.g. 15 replicas for presigned URLs, 5 for fence, etc.)
-  - You might need to add a configuration entry to create the ELB service:
+>[!NOTE]
+>  - Use the release manifest as a starting point: https://github.com/uc-cdis/cdis-manifest/tree/master/releases, but be sure to edit the scaling values as the defaults tend to be quite high (e.g. 15 replicas for presigned URLs, 5 for fence, etc.)
+>  - You might need to add a configuration entry to create the ELB service:
 
 ```json
 "deploy_elb": "true",
@@ -362,7 +366,8 @@ if [[ -z "$GEN3_NOPROXY" ]]; then
 fi
 ```
 
-NOTE: It is very important to check the first two lines, which reference the specific deployment. Be sure to check that this matches your current deployment. Edit as necessary, then source it:
+>[!WARNING]
+>It is very important to check the first two lines, which reference the specific deployment. Be sure to check that this matches your current deployment. Edit as necessary, then source it:
 
 ```bash
 source ~/.bashrc
@@ -382,7 +387,8 @@ kubectl get nodes
 ```bash
 gen3 roll all
 ```
-  Note: it might take a few minutes to complete; let it run.
+>[!Note]
+> This process might take a few minutes to complete; let it run and monitor the output for error messages.
 
 
 9. Get the newly created ELB endpoint so you can point your domain to it.
@@ -406,9 +412,8 @@ After saving your edits, run `gen3 kube-setup-fence` to redeploy Fence with the 
 
 Clean up is relatively easy. Because we use terraform to build up the infrastructure, we'll also use it to destroy them all.
 
-**NOTE:** Databases have a destroy prevention flag to avoid accidental deletion, therefore if you are deliverately deleting your commons, you may need to skip the flag.
-
-Run the following to remove the protection:
+>[!NOTE]
+>Databases have a destroy prevention flag to avoid accidental deletion, therefore if you are deliverately deleting your commons, you may need to skip the flag. Use the command below to remove the protection.
 
 ```bash
 sed -i 's/prevent_destroy/#prevent_destroy/g' $HOME/cloud-automation/tf_files/aws/commons/kube.tf
@@ -466,10 +471,10 @@ gen3 tfplan --destroy
 gen3 tfapply
 ```
 
-**NOTES:**
-* Sometimes buckets created through `gen3` get populated with logs and other data. You may need to empty them before running the above commands. Otherwise, when applying the plan it might fail to delete the bucket.
-* RDS instances will sometimes complain about snapshots. In this case, probably easiest to delete them manually using the AWS web console.
-* If any destroys get stuck, try using terraform directly, e.g.:
+>[!NOTE]
+>* Sometimes buckets created through `gen3` get populated with logs and other data. You may need to empty them before running the above commands. Otherwise, when applying the plan it might fail to delete the bucket.
+>* RDS instances will sometimes complain about snapshots. In this case, probably easiest to delete them manually using the AWS web console.
+>* If any destroys get stuck, try using terraform directly, as in the command below.
 ```
 terraform destroy
 ```
