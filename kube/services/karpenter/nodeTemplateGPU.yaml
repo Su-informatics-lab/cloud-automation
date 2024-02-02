@@ -41,6 +41,12 @@ spec:
     --BOUNDARY
     Content-Type: text/cloud-config; charset="us-ascii"
 
+    mounts:
+      - ['fstype': 'bpf', 'mountpoint': '/sys/fs/bpf', 'opts': 'rw,relatime']
+
+    --BOUNDARY
+    Content-Type: text/cloud-config; charset="us-ascii"
+
     power_state:
       delay: now
       mode: reboot
