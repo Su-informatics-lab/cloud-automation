@@ -229,6 +229,9 @@ Be patient! This step will take quite a while (15-20 mins).
 
 ## Fourth part, deploy the kubernetes cluster
 
+>[!NOTE] 
+>This part of the deployment requires that you have an updated version of the aws-iam-authenticator binary. The version that is usually installed via the VM setup script(s) is tool old (0.5.0) for recent version of Kubernetes The binary is supposed to be included in the AWS CLI, so one option is to try upgrading the client using the instructions in the AWS docs. If that does not work, the most reliable method is to simply download the binary directly from [GitHub](https://github.com/kubernetes-sigs/aws-iam-authenticator) and drop it into the `/usr/local/bin` directory. Ideally, use a symbolic link to allow you to shift versions, e.g.: `aws-iam-authenticator -> /usr/local/bin/aws-iam-authenticator_0.6.14_linux_amd64`.
+
 1. Initialize the EKS module
 ```bash
 gen3 workon cdistest commons-test_eks
