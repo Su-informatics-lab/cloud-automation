@@ -65,6 +65,9 @@ export GEN3_NOPROXY='no'
 bash cloud-automation/gen3/bin/kube-setup-workvm.sh
 ```
 
+>[!Warning]
+>The above step is absolutely critical because (among other things) it creates the Gen3Secrets folder, which will be used in subsequent parts of the deployment. If you skip this step, you will need to manually create the Gen3Secrets folder.
+
 4. kube-setup-workvm.sh adds a few required configurations to the user's local bashrc file. To be able to use them, we may want to source it, otherwise we'll have to logout and in again.
 ```bash
 source ${HOME}/.bashrc
