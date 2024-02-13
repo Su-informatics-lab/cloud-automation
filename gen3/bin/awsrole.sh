@@ -247,13 +247,15 @@ EOF
     gen3_log_err $errMsg
     return 1
   fi
-  shift || return 1
-  local flag=""
+local flag=""
+# Check if shift succeeds
+if shift; then
   # Check if the "all_namespaces" flag is provided
   if [[ "$1" == "-f" || "$1" == "--flag" ]]; then
     flag="$2"
     shift 2
   fi
+fi
 
   # check if the name is already used by another entity
   local entity_type
