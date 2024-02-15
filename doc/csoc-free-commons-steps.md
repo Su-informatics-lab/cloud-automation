@@ -186,6 +186,12 @@ NOTE: There is sometimes an error on the first "apply" about bucket policy confl
 cp -r commons-test_output/ $HOME
 ```
 
+>[!WARNING]
+>The squid proxy will need to be updated with two domains in the web wildcard file:
+> - .ardac.org
+> - .cilogon.org
+>If the first entry is missing, the dictionary will not load. If the second entry is missing, the fence login will not work.
+
 ## Third part: deploy Elasticsearch
 
 >[!NOTE] 
